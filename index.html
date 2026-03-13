@@ -1,0 +1,556 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Vansh Vaishnav — Java Full Stack Developer | IIST Indore</title>
+
+    <!-- Bootstrap 5.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- GSAP + ScrollTrigger + Lenis + Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r161/three.min.js"></script>
+
+    <style>
+        :root {
+          --navy: #0a192f;
+          --navy-light: #112240;
+          --navy-lighter: #172a45;
+          --slate: #8892b0;
+          --slate-light: #a8b2d1;
+          --slate-lighter: #ccd6f6;
+          --white: #e6f1ff;
+          --green: #64ffda;
+          --purple: #8b5cf6;
+          --gradient: linear-gradient(135deg, var(--green) 0%, var(--purple) 70%, #c084fc 100%);
+          --shadow-lg: 0 25px 50px -12px rgba(0, 0,0, 0.25);
+          --shadow-glow: 0 0 30px rgba(100, 255, 218, 0.3);
+          --radius: 16px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+          font-family: 'Inter', sans-serif;
+          background: var(--navy);
+          color: var(--slate-lighter);
+          overflow-x: hidden;
+          line-height: 1.6;
+        }
+
+        #heroCanvas, #bgCanvas3D {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100vh;
+          z-index: -1;
+        }
+
+        .container-fluid-custom { max-width: 1400px; }
+
+        /* Navbar */
+        .navbar-custom {
+          background: rgba(10, 25, 47, 0.95) !important;
+          backdrop-filter: blur(20px);
+          border-bottom: 1px solid rgba(100, 255, 218, 0.1);
+        }
+        .navbar-brand-custom {
+          font-weight: 700;
+          font-size: 1.6rem;
+          background: var(--gradient);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+        .nav-link-custom:hover {
+          color: var(--green) !important;
+          background: rgba(100, 255, 218, 0.1);
+          border-radius: var(--radius);
+          transform: scale(1.05);
+        }
+
+        /* Hero */
+        .hero-section {
+          min-height: 100vh;
+          display: flex;
+          align-items: center;
+          padding: 0 0 10rem 0;
+        }
+        .hero-h1 {
+          font-size: clamp(3.5rem, 8vw, 7rem);
+          font-weight: 800;
+          background: var(--gradient);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          line-height: 1;
+          margin-bottom: 1rem;
+        }
+        .hero-subtitle {
+          font-size: 1.4rem;
+          color: var(--slate);
+          font-weight: 500;
+          margin-bottom: 1.5rem;
+        }
+        .hero-lead {
+          font-size: 1.3rem;
+          max-width: 60ch;
+          color: var(--slate-light);
+          margin-bottom: 3rem;
+        }
+        .btn-modern {
+          padding: 1.2rem 2.5rem;
+          border-radius: var(--radius);
+          font-weight: 600;
+          font-size: 1.1rem;
+          border: 2px solid transparent;
+          position: relative;
+          overflow: hidden;
+          transition: all 0.4s cubic-bezier(0.23, 1, 0.320, 1);
+        }
+        .btn-modern::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+          transition: left 0.5s;
+        }
+        .btn-modern:hover::before { left: 100%; }
+        .btn-primary-custom {
+          background: var(--gradient);
+          color: var(--navy);
+          box-shadow: var(--shadow-glow);
+        }
+        .btn-secondary-custom {
+          background: transparent;
+          color: var(--green);
+          border-color: var(--green);
+        }
+        .btn-modern:hover {
+          transform: translateY(-4px) scale(1.05);
+          box-shadow: var(--shadow-lg), var(--shadow-glow);
+        }
+        .profile-img-custom {
+          width: 100%;
+          max-width: 400px;
+          border-radius: var(--radius);
+          box-shadow: var(--shadow-lg);
+          position: relative;
+        }
+        .profile-img-custom::before {
+          content: '';
+          position: absolute;
+          top: -20px;
+          left: -20px;
+          right: -20px;
+          bottom: -20px;
+          background: var(--gradient);
+          border-radius: 50%;
+          z-index: -1;
+          opacity: 0.1;
+          filter: blur(20px);
+        }
+
+        /* Sections */
+        .section-title {
+          font-size: clamp(2.5rem, 6vw, 4rem);
+          font-weight: 800;
+          text-align: center;
+          margin-bottom: 5rem;
+          background: var(--gradient);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+        }
+        .section-padding { padding: 8rem 0; }
+
+        /* Cards */
+        .card-modern {
+          background: var(--navy-light);
+          border: 1px solid rgba(100, 255, 218, 0.1);
+          border-radius: var(--radius);
+          padding: 2.5rem;
+          transition: all 0.4s cubic-bezier(0.23, 1, 0.320, 1);
+          position: relative;
+          overflow: hidden;
+        }
+        .card-modern::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          height: 4px;
+          background: var(--gradient);
+          transform: scaleX(0);
+          transition: transform 0.4s ease;
+        }
+        .card-modern:hover {
+          border-color: var(--green);
+          transform: translateY(-12px);
+          box-shadow: var(--shadow-lg), var(--shadow-glow);
+        }
+        .card-modern:hover::before { transform: scaleX(1); }
+        .card-title {
+          color: var(--white);
+          font-size: 1.6rem;
+          font-weight: 700;
+          margin-bottom: 1rem;
+        }
+        .company-name {
+          color: var(--green);
+          font-weight: 600;
+          font-size: 1.1rem;
+        }
+        .skill-tag {
+          background: rgba(100, 255, 218, 0.1);
+          color: var(--green);
+          padding: 0.5rem 1.2rem;
+          border-radius: 50px;
+          font-size: 0.9rem;
+          margin: 0.25rem;
+          border: 1px solid rgba(100, 255, 218, 0.2);
+        }
+
+        /* Contact */
+        .contact-card { background: var(--navy-lighter); }
+        .form-control-custom {
+          background: var(--navy);
+          border: 1px solid var(--slate);
+          border-radius: var(--radius);
+          color: var(--white);
+          padding: 1.2rem;
+        }
+        .form-control-custom:focus {
+          border-color: var(--green);
+          box-shadow: 0 0 0 0.25rem rgba(100, 255, 218, 0.1);
+        }
+
+        /* Floating elements */
+        .floating-icon {
+          position: fixed;
+          font-size: 2rem;
+          color: var(--green);
+          opacity: 0.3;
+          z-index: 10;
+          animation: float 6s ease-in-out infinite;
+        }
+        @keyframes float {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-20px); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+          .hero-section { text-align: center; }
+          .navbar-nav { gap: 1rem; }
+        }
+    </style>
+</head>
+<body>
+<!-- 3D Background Canvas -->
+<canvas id="bgCanvas3D"></canvas>
+
+<!-- Floating Icons (Decorative) -->
+<div class="floating-icon" style="top:20%;left:10%;animation-delay:0s;"><i class="fas fa-code"></i></div>
+<div class="floating-icon" style="top:60%;right:15%;animation-delay:2s;"><i class="fas fa-server"></i></div>
+<div class="floating-icon" style="bottom:30%;left:15%;animation-delay:4s;"><i class="fas fa-database"></i></div>
+
+<div class="site-wrapper">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom fixed-top">
+        <div class="container-fluid container-fluid-custom">
+            <a class="navbar-brand navbar-brand-custom" href="#">Vansh Vaishnav</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav gap-3">
+                    <li class="nav-item"><a class="nav-link nav-link-custom py-2 px-3" href="#home">Home</a></li>
+                    <li class="nav-item"><a class="nav-link nav-link-custom py-2 px-3" href="#about">About</a></li>
+                    <li class="nav-item"><a class="nav-link nav-link-custom py-2 px-3" href="#experience">Experience</a></li>
+                    <li class="nav-item"><a class="nav-link nav-link-custom py-2 px-3" href="#projects">Projects</a></li>
+                    <li class="nav-item"><a class="nav-link nav-link-custom py-2 px-3" href="#skills">Skills</a></li>
+                    <li class="nav-item"><a class="nav-link nav-link-custom py-2 px-3" href="#contact">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero-section">
+        <canvas id="heroCanvas"></canvas>
+        <div class="container-fluid container-fluid-custom">
+            <div class="row align-items-center g-5">
+                <div class="col-lg-6">
+
+                    <h1 class="hero-h1 display-2 fw-bold mb-3">Vansh Vaishnav</h1>
+                    <p class="hero-subtitle fs-3 mb-4">Java Full Stack Developer</p>
+                    <p class="hero-lead lead mb-5">3rd-year CSE student at IIST Bhopal building scalable web apps with Spring Boot, React & MySQL. Passionate about clean architecture and performant systems.</p>
+                    <div class="d-flex flex-wrap gap-3">
+                        <a href="#contact" class="btn btn-modern btn-primary-custom">
+                            <i class="fas fa-paper-plane me-2"></i>Get In Touch
+                        </a>
+                        <a href="Resume.pdf" class="btn btn-modern btn-secondary-custom" download>
+                            <i class="fas fa-download me-2"></i>Download Resume
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-6 text-center">
+                    <img src="/images/vansh image.jpeg" alt="Vansh Vaishnav" class="profile-img-custom img-fluid shadow-lg">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About -->
+    <section id="about" class="section-padding">
+        <div class="container-fluid container-fluid-custom">
+            <h2 class="section-title mb-5">About Me</h2>
+            <div class="row g-5">
+                <div class="col-lg-4">
+                    <div class="card-modern h-100">
+                        <h3 class="card-title"><i class="fas fa-user-graduate text-green me-2"></i>Background</h3>
+                        <p class="text-slate-light">B.Tech CSE at IIST indore (GPA 7/10). Specialized in Java backend development with hands-on experience in full-stack projects.</p>
+                    </div>
+                </div>
+                <div class="col-lg-8">
+                    <div class="card-modern h-100">
+                        <h3 class="card-title"><i class="fas fa-heart text-green me-2"></i>What I Love</h3>
+                        <ul class="list-unstyled mt-3">
+                            <li class="mb-3"><i class="fas fa-arrow-right text-green me-2"></i>Building scalable REST APIs & microservices with Spring Boot</li>
+                            <li class="mb-3"><i class="fas fa-arrow-right text-green me-2"></i>Modern React UIs with state management & performance optimization</li>
+                            <li class="mb-3"><i class="fas fa-arrow-right text-green me-2"></i>Database design & optimization (MySQL, PostgreSQL)</li>
+                            <li><i class="fas fa-arrow-right text-green me-2"></i>Clean code, TDD, Docker containerization</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Experience & Projects -->
+    <section id="experience" class="section-padding bg-navy-lighter">
+        <div class="container-fluid container-fluid-custom">
+            <h2 class="section-title mb-5">Experience & Projects</h2>
+            <div class="row g-4">
+                <div class="col-lg-6">
+                    <div class="card-modern">
+                        <h3 class="card-title">Car Rental System</h3>
+                        <p class="company-name mb-2"><i class="fas fa-car me-2"></i>Full-Stack Booking Platform</p>
+                        <p class="text-slate-light mb-3">Complete car rental management with authentication, payments, admin dashboard & real-time availability.</p>
+                        <div class="d-flex flex-wrap gap-2 mb-3">
+                            <span class="skill-tag">Java</span>
+                            <span class="skill-tag">Spring Boot</span>
+                            <span class="skill-tag">MySQL</span>
+                            <span class="skill-tag">JDBC</span>
+                        </div>
+                        <a href="https://github.com/vanshvaishnav/car-rental" target="_blank" class="btn btn-secondary-custom btn-sm">
+                            <i class="fab fa-github me-1"></i>View Code
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="card-modern">
+                        <h3 class="card-title">Auto Silent Android App</h3>
+                        <p class="company-name mb-2"><i class="fas fa-mobile-alt me-2"></i>Spring Boot Backend</p>
+                        <p class="text-slate-light mb-3">Location/time-based auto silent with REST APIs, push notifications & user preferences.</p>
+                        <div class="d-flex flex-wrap gap-2 mb-3">
+                            <span class="skill-tag">Android</span>
+                            <span class="skill-tag">Spring Boot</span>
+                            <span class="skill-tag">Retrofit</span>
+                        </div>
+                        <a href="https://github.com/vanshvaishnav/auto-silent" target="_blank" class="btn btn-secondary-custom btn-sm">
+                            <i class="fab fa-github me-1"></i>View Code
+                        </a>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="card-modern">
+                        <h3 class="card-title">IIST Academic Projects & Portfolio v3</h3>
+                        <p class="company-name mb-2"><i class="fas fa-university me-2"></i>B.Tech CSE • 2024-Present</p>
+                        <p class="text-slate-light mb-3">Production-grade apps, UML modeling, database systems. This portfolio built with Bootstrap 5, Three.js & advanced GSAP.</p>
+                        <div class="d-flex flex-wrap gap-2 mb-3">
+                            <span class="skill-tag">Java</span>
+                            <span class="skill-tag">React</span>
+                            <span class="skill-tag">Bootstrap</span>
+                            <span class="skill-tag">Three.js</span>
+                        </div>
+                        <a href="https://github.com/vanshvaishnav/portfolio" target="_blank" class="btn btn-secondary-custom">
+                            <i class="fab fa-github me-1"></i>Source Code
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Skills -->
+    <section id="skills" class="section-padding">
+        <div class="container-fluid container-fluid-custom">
+            <h2 class="section-title mb-5">Tech Stack</h2>
+            <div class="row g-4 text-center">
+                <div class="col-md-3 col-sm-6">
+                    <div class="card-modern h-100">
+                        <i class="fas fa-server fa-3x text-green mb-4"></i>
+                        <h4>Backend</h4>
+                        <div class="d-flex flex-wrap justify-content-center gap-2 mt-3">
+                            <span class="skill-tag">Java 17+</span>
+                            <span class="skill-tag">Spring Boot</span>
+                            <span class="skill-tag">REST APIs</span>
+                            <span class="skill-tag">Hibernate</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <div class="card-modern h-100">
+                        <i class="fab fa-react fa-3x text-green mb-4"></i>
+                        <h4>Frontend</h4>
+                        <div class="d-flex flex-wrap justify-content-center gap-2 mt-3">
+                            <span class="skill-tag">React</span>
+                            <span class="skill-tag">JavaScript</span>
+                            <span class="skill-tag">Bootstrap 5</span>
+                            <span class="skill-tag">CSS3</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <div class="card-modern h-100">
+                        <i class="fas fa-database fa-3x text-green mb-4"></i>
+                        <h4>Database</h4>
+                        <div class="d-flex flex-wrap justify-content-center gap-2 mt-3">
+                            <span class="skill-tag">MySQL</span>
+                            <span class="skill-tag">PostgreSQL</span>
+                            <span class="skill-tag">MongoDB</span>
+                            <span class="skill-tag">Redis</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <div class="card-modern h-100">
+                        <i class="fas fa-tools fa-3x text-green mb-4"></i>
+                        <h4>Tools</h4>
+                        <div class="d-flex flex-wrap justify-content-center gap-2 mt-3">
+                            <span class="skill-tag">Git</span>
+                            <span class="skill-tag">Docker</span>
+                            <span class="skill-tag">Maven</span>
+                            <span class="skill-tag">Postman</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact -->
+    <section id="contact" class="section-padding">
+    <div class="contact-card card-modern p-5">
+        <h3 class="mb-4">Send Message</h3>
+
+        <form id="contactForm">
+
+            <div class="row g-3">
+
+                <div class="col-md-6">
+                    <input id="name" type="text" class="form-control form-control-custom" placeholder="Your Name" required>
+                </div>
+
+                <div class="col-md-6">
+                    <input id="email" type="email" class="form-control form-control-custom" placeholder="Your Email" required>
+                </div>
+
+                <div class="col-12">
+                    <textarea id="message" class="form-control form-control-custom" rows="5" placeholder="Tell me about your project..." required></textarea>
+                </div>
+
+                <div class="col-12">
+                    <button type="submit" class="btn btn-modern btn-primary-custom w-100">
+                        Send Message <i class="fas fa-paper-plane ms-2"></i>
+                    </button>
+                </div>
+
+            </div>
+
+        </form>
+
+    </div>
+    </section>
+
+    <!-- Footer -->
+
+
+    <!-- Footer OUTSIDE script -->
+    <footer class="text-center py-5 border-top" style="border-color: rgba(100,255,218,0.1); color: var(--slate);">
+        <p>
+            © 2026 Vansh Vaishnav — Built with <i class="fas fa-heart text-danger"></i> in Indore, MP.
+            <a href="https://github.com/vanshvaishnav/portfolio" target="_blank" class="text-green ms-2">
+                <i class="fab fa-github"></i> View Source
+            </a>
+        </p>
+    </footer>
+
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const contactForm = document.getElementById("contactForm");
+        const submitBtn = contactForm.querySelector("button[type='submit']");
+
+        contactForm.addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            // Get form values
+            const name = document.getElementById("name").value.trim();
+            const email = document.getElementById("email").value.trim();
+            const message = document.getElementById("message").value.trim();
+
+            if (!name || !email || !message) {
+                alert("Please fill all fields!");
+                return;
+            }
+
+            // Disable button while sending
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Sending...";
+
+            fetch("http://localhost:8082/api/contact", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name, email, message })
+            })
+            .then(async (res) => {
+                if (!res.ok) {
+                    const err = await res.text();
+                    throw new Error(err || "Server Error");
+                }
+                return res.json();
+            })
+            .then(data => {
+                alert("Message Sent Successfully!");
+                contactForm.reset();
+            })
+            .catch(err => {
+                console.error(err);
+                alert("Error sending message: " + err.message);
+            })
+            .finally(() => {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'Send Message <i class="fas fa-paper-plane ms-2"></i>';
+            });
+        });
+    });
+</script>
+</body>
+</html>
